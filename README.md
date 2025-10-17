@@ -1,4 +1,4 @@
-site here: https://lukedevse.github.io/subteraudiolibrary/
+site here: https://sillyy.lol
 if you want to contribute anything, make a pull request.
 as currently, it only has a small amount of users and the site looks ugly.
 and please do not throw my code into chatgpt and say "make site look better" and make a pull request
