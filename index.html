@@ -1,0 +1,176 @@
+<head>
+    <link rel="icon" type="image/x-icon" href="syntax.ico">
+    <title>Subter Audio Library</title>
+</head>
+<body>
+    <center><h1>Favourites</h1></center>
+    <div class="favouritesclass"></div>
+    <hr>
+</body>
+<script>
+// ok this is really hard to understand
+// basically its a.... table... that stores all the json names
+const users = ["20.json","123.json", "3.json", "9.json", "14.json", "8.json", "114.json", "563.json", "26.json", "1.json", "359.json", "12.json", "48.json", "150.json", "365.json", "119.json"];
+// for each user it runs the function fetching
+users.forEach(fetching);
+const getlocalstorage = JSON.parse(localStorage.getItem("favourite"));
+console.log(getlocalstorage)
+function fetching(val) {
+    // gets the value, fetches from server, then some js crap to get the json data
+    fetch("users/" + val).then(response => response.json()).then(jsondata => {
+    //make a <center>
+    const centering = document.createElement("center");
+    // make an <h1>
+    const title = document.createElement("h1");
+    // adding div so unfavouring puts it back in place
+    const userdiv = document.createElement("div")
+    userdiv.className = jsondata.data[0].owner.username;
+    // set the h1 text to their username
+    title.innerHTML = jsondata.data[0].owner.username
+    // add the h1 text to their user
+    centering.appendChild(title);
+    // actually adds center
+    document.body.appendChild(centering);
+    document.body.appendChild(userdiv);
+    // then for each sound, it will make an entry on the page
+    jsondata.data.forEach(makeentry)
+    // after foreach is done, it will make a little line thing to sepreate other users.
+    const seperater = document.createElement("hr");
+    document.body.appendChild(seperater);
+    })
+}
+function inlocalstorage(id) {
+    if (getlocalstorage == null) {
+        return false;
+    }
+    if (getlocalstorage.includes(id)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+function setlocalstorage(val) {
+    var olditem = localStorage.getItem("favourite");
+    var parsedstuff = JSON.parse(olditem);
+    if (parsedstuff == null) {
+        localStorage.setItem("favourite",JSON.stringify([val]))
+    }
+    else {
+        parsedstuff.push(val)
+        localStorage.setItem("favourite",JSON.stringify(parsedstuff))
+    }
+}
+function removelocalstorage(val) {
+    var olditem = localStorage.getItem("favourite");
+    var parsedstuff = JSON.parse(olditem);
+    if (parsedstuff != null) {
+        parsedstuff.splice(parsedstuff.indexOf(val),1)
+        localStorage.setItem("favourite",JSON.stringify(parsedstuff))
+    }
+}
+function makeentry(v) {
+        //console.log(v.assetId)
+        //console.log(v.assetName)
+        // making it to so u can actually click it
+        const mainlink = document.createElement("a")
+        mainlink.href = "https://www.subter.org/library/" + v.assetId.toString(); // where the link actually goes
+        mainlink.target = "_blank" // opens in a new tab
+        mainlink.className = "item" // for css purposes
+        mainlink.id = v.owner.username.toString();
+        // making image with the size of 200px
+        const image = document.createElement("img");
+        image.src = "audio.png";
+        image.height = 200;
+        // so the text is below image
+        const breakele = document.createElement("br");
+        // make h3 with sound name
+        const title = document.createElement("h3")
+        title.innerHTML = v.assetName
+        // make another center that im pretty sure dosent work but im too lazy to remove
+        const centering = document.createElement("center");
+        centering.className = "center";
+        // create play button (yes its on purpose that it replaces the page with the audio)
+        const play = document.createElement("a")
+        play.innerHTML = "Play"
+        play.href = "https://www.subter.org/asset?id=" + v.assetId.toString();
+        play.className = "play"
+        play.target = "_blank" // opens in a new tab
+        const favourite = document.createElement("a")
+        favourite.innerHTML = "Favourite"
+        favourite.className = "favourite"
+        favourite.href = "#";
+        favourite.onclick = function() {
+            document.getElementsByClassName("favouritesclass")[0].appendChild(mainlink);
+            favourite.innerHTML = "Unfavourite"
+            setlocalstorage(v.assetId);
+        };
+        // actually add everything
+        centering.appendChild(play);
+        centering.appendChild(favourite);
+        mainlink.appendChild(image);
+        mainlink.appendChild(breakele);
+        mainlink.appendChild(title)
+        mainlink.appendChild(centering);
+        if (inlocalstorage(Number(v.assetId)) == true) {
+            document.getElementsByClassName("favouritesclass")[0].appendChild(mainlink);
+            favourite.innerHTML = "Unfavourite"
+            favourite.onclick = function() {
+                document.getElementsByClassName(v.owner.username.toString())[0].appendChild(mainlink);
+                favourite.innerHTML = "Favourite"
+                removelocalstorage(v.assetId);
+            };
+        }
+        else {
+            document.getElementsByClassName(v.owner.username.toString())[0].appendChild(mainlink);
+        }
+    }
+</script>
+<style>
+    body {
+        background-color: #2f2f2f;
+    }
+    .item {
+        background-color: #444444;
+        display:    inline-block;
+        border-radius: 5px;
+        text-decoration: none;
+        margin: 5px;
+    }
+    h1 {
+        color: white;
+        font-family: sans-serif;
+    }
+    h3 {
+        color: white;
+        font-family: sans-serif;
+        width: 200px;
+        display:inline-block;
+        text-overflow: ellipsis;
+        white-space:nowrap;
+        overflow:hidden;
+    }
+    .play {
+        color: white;
+        font-family: sans-serif;
+        word-wrap: break-word;
+        text-decoration: none;
+    }
+    .favourite {
+        color: white;
+        font-family: sans-serif;
+        word-wrap: break-word;
+        text-decoration: none;
+    }
+    .center {
+        column-gap: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    a:hover {
+        color: rgb(27, 118, 229);
+    }
+    .item:hover {
+        background-color: #5f5f5f;
+    }
+</style>
